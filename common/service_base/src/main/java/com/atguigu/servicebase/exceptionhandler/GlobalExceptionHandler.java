@@ -18,6 +18,9 @@ public class GlobalExceptionHandler {
         return R.error().message("有吴！");
     }
 
+
+
+
     //特定异常  除数不能为0
     @ExceptionHandler(ArithmeticException.class)
     @ResponseBody
