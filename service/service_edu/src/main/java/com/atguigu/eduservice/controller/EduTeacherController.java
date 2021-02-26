@@ -31,7 +31,8 @@ import java.util.Map;
  */
 @Api(description = "讲师管理")
 @RestController
-@RequestMapping("/eduservice/edu-teacher")
+@RequestMapping("/eduservicer/eduteacher")
+@CrossOrigin//解决跨域
 public class EduTeacherController {
 
     @Resource
@@ -39,7 +40,7 @@ public class EduTeacherController {
 
     @ApiOperation(value = "讲师列表")
     @GetMapping("findAll")
-    public R findAll(){
+    public R findAll() {
         //异常测试
        /* try {
             int i = 10/0;
@@ -49,14 +50,15 @@ public class EduTeacherController {
 
         List<EduTeacher> list = eduTeacherService.list(null);
 
-        return R.ok().data("items",list);
+        return R.ok().data("items", list);
     }
+
     @ApiOperation(value = "逻辑删除讲师")
     @DeleteMapping("remoTeacherById/{id}")
     public R remoTeacherById(
-            @ApiParam(name = "id",value = "讲师ID",required = true)
-            @PathVariable String id){
-        if(eduTeacherService.removeById(id)){
+            @ApiParam(name = "id", value = "讲师ID", required = true)
+            @PathVariable String id) {
+        if (eduTeacherService.removeById(id)) {
             return R.ok();
         }
         return R.error();
@@ -65,12 +67,12 @@ public class EduTeacherController {
     @ApiOperation(value = "讲师列表分页")
     @GetMapping("pageTeacher/{pageNo}/{pageSize}")
     public R pageTeacher(
-            @ApiParam(name = "pageNo",value = "当前页",required = true)
+            @ApiParam(name = "pageNo", value = "当前页", required = true)
             @PathVariable Integer pageNo,
-            @ApiParam(name = "pageSize",value = "每页条数",required = true)
-                         @PathVariable Integer pageSize){
-        Page<EduTeacher> page = new Page<>(pageNo,pageSize);
-        eduTeacherService.page(page,null);
+            @ApiParam(name = "pageSize", value = "每页条数", required = true)
+            @PathVariable Integer pageSize) {
+        Page<EduTeacher> page = new Page<>(pageNo, pageSize);
+        eduTeacherService.page(page, null);
         long total = page.getTotal();//总数据条数
         List<EduTeacher> records = page.getRecords();//数据list集合
 
@@ -79,65 +81,68 @@ public class EduTeacherController {
         map.put("rows",records);
         return R.ok().data(map);*/
 
-        return R.ok().data("total",total).data("rows",records);
+        return R.ok().data("total", total).data("rows", records);
     }
 
 
     @ApiOperation(value = "讲师列表分页条件查询")
     @PostMapping("pageTeacherCondition/{pageNo}/{pageSize}")
-    public R pageTeacherCondition(@ApiParam(name = "pageNo",value = "当前页",required = true)
-                                      @PathVariable Integer pageNo,
-                                  @ApiParam(name = "pageSize",value = "每页条数",required = true)
-                                      @PathVariable Integer pageSize,
-                                  @RequestBody(required = false) VoTeacherQuery vo){
-        Page<EduTeacher> page = new Page<>(pageNo,pageSize);
+    public R pageTeacherCondition(@ApiParam(name = "pageNo", value = "当前页", required = true)
+                                  @PathVariable Integer pageNo,
+                                  @ApiParam(name = "pageSize", value = "每页条数", required = true)
+                                  @PathVariable Integer pageSize,
+                                  @RequestBody(required = false) VoTeacherQuery vo) {
+        Page<EduTeacher> page = new Page<>(pageNo, pageSize);
         //条件
         QueryWrapper<EduTeacher> queryWrapper = new QueryWrapper<>();
-        if(!StringUtils.isEmpty(vo.getName())){
-            queryWrapper.like("name",vo.getName());
+        if (!StringUtils.isEmpty(vo.getName())) {
+            queryWrapper.like("name", vo.getName());
         }
-        if(!StringUtils.isEmpty(vo.getLevel())){
-            queryWrapper.eq("level",vo.getLevel());
+        if (!StringUtils.isEmpty(vo.getLevel())) {
+            queryWrapper.eq("level", vo.getLevel());
         }
-        if(!StringUtils.isEmpty(vo.getBegin())){
-            queryWrapper.ge("gmt_create",vo.getBegin());//大于
+        if (!StringUtils.isEmpty(vo.getBegin())) {
+            queryWrapper.ge("gmt_create", vo.getBegin());//大于
         }
-        if(!StringUtils.isEmpty(vo.getEnd())){
-            queryWrapper.le("gmt_modified",vo.getEnd());//小于
+        if (!StringUtils.isEmpty(vo.getEnd())) {
+            queryWrapper.le("gmt_create", vo.getEnd());//小于
         }
+        queryWrapper.orderByDesc("gmt_create");
 
 
-        eduTeacherService.page(page,queryWrapper);
+        eduTeacherService.page(page, queryWrapper);
         long total = page.getTotal();//总数据条数
         List<EduTeacher> records = page.getRecords();//数据list集合
         Map map = new HashMap();
-        map.put("total",total);
-        map.put("rows",records);
+        map.put("total", total);
+        map.put("rows", records);
         return R.ok().data(map);
     }
 
+
     @ApiOperation(value = "添加讲师")
     @PostMapping("addTeacher")
-    public R addTeacher(@RequestBody(required = true) EduTeacher eduTeacher ){
-        if(eduTeacherService.save(eduTeacher)){
+    public R addTeacher(@RequestBody(required = true) EduTeacher eduTeacher) {
+        if (eduTeacherService.save(eduTeacher)) {
             return R.ok();
         }
         return R.error();
     }
+
     @ApiOperation(value = "根据讲师Id查询")
     @GetMapping(value = "getTeacherById/{id}")
-    public R getTeacherById(@PathVariable Integer id){
+    public R getTeacherById(@PathVariable String id) {
         EduTeacher teacher = eduTeacherService.getById(id);
-        return R.ok().data("teacher",teacher);
+        return R.ok().data("teacher", teacher);
     }
 
 
     @ApiOperation(value = "修改讲师")
     @PostMapping("updateTeacher")
-    public R updateTeacher(@RequestBody EduTeacher eduTeacher){
+    public R updateTeacher(@RequestBody EduTeacher eduTeacher) {
 
         boolean flay = eduTeacherService.updateById(eduTeacher);
-        if(flay)return R.ok();
+        if (flay) return R.ok();
 
         return R.error();
     }
